@@ -4,9 +4,9 @@ import { validationResult } from "express-validator";
 import { Image } from "../../domain/entities/image";
 import { CreateImageUseCase } from "../../domain/interfaces/use-cases/image/create-image";
 import { GetImageUseCase } from "../../domain/interfaces/use-cases/image/get-image";
-import { ConvertImageUseCase } from "../../domain/interfaces/use-cases/image/convert-image";
+import { ProcessImageUseCase } from "../../domain/interfaces/use-cases/image/process-image";
 import { uploadImageMiddleware } from "../middlewares/upload-image-middleware";
-import { getImageValidator } from "../middlewares/validator-middleware";
+import { getImageValidations } from "../middlewares/validator-middleware";
 
 const handleNaN = <T extends null | undefined>(
   value: number,
@@ -18,7 +18,7 @@ const handleNaN = <T extends null | undefined>(
 export const ImageRouter = (
   createImageUseCase: CreateImageUseCase,
   getImageUseCase: GetImageUseCase,
-  convertImageUseCase: ConvertImageUseCase
+  processImageUseCase: ProcessImageUseCase
 ) => {
   const router = express.Router();
 
@@ -26,25 +26,34 @@ export const ImageRouter = (
     "/",
     uploadImageMiddleware.single("upload"),
     async (request: Request, response: Response) => {
-      let uid = "";
-      if (request.file?.buffer) {
-        const fileType = path
-          .extname(request.file.originalname)
-          .slice(1) as Image["fileType"];
-        uid = await createImageUseCase(request.file.buffer, fileType);
+      if (!request.file?.buffer) {
+        return response.status(400).send({ message: "File buffer missing" });
       }
-      response.statusCode = 201;
-      response.json({ imageId: uid });
+
+      const fileType = path
+        .extname(request.file.originalname)
+        .slice(1) as Image["fileType"];
+
+      try {
+        const uid = await createImageUseCase(request.file.buffer, fileType);
+        console.log(uid, "uid");
+
+        response.statusCode = 201;
+        response.json({ imageId: uid });
+      } catch (error) {
+        response.sendStatus(500);
+      }
     }
   );
 
   router.get(
     "/:id",
-    getImageValidator,
+    getImageValidations,
     async (request: Request, response: Response) => {
       const errors = validationResult(request);
 
       if (!errors.isEmpty()) {
+        console.log(errors.mapped());
         return response.status(400).send(errors.mapped());
       }
 
@@ -57,17 +66,27 @@ export const ImageRouter = (
         undefined
       );
 
-      const image = await getImageUseCase(id, requestedFileType);
+      try {
+        const image = await getImageUseCase(id, requestedFileType);
 
-      const convertedImage = await convertImageUseCase(
-        image,
-        width,
-        height,
-        angle
-      );
+        const convertedImage = await processImageUseCase(
+          image,
+          width,
+          height,
+          angle
+        );
 
-      response.contentType(`image/${convertedImage.fileType}`);
-      response.end(convertedImage.buffer);
+        response.contentType(`image/${convertedImage.fileType}`);
+        response.end(convertedImage.buffer);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.log(error);
+          if (error.message === "NOT_FOUND") {
+            return response.status(404).send({ message: error.message });
+          }
+        }
+        response.sendStatus(500);
+      }
     }
   );
 

@@ -1,6 +1,6 @@
 import { Image } from "../../../entities/image";
 
-export interface ConvertImageUseCase {
+export interface ProcessImageUseCase {
   (
     image: Image,
     width: number | null,

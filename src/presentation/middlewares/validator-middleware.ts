@@ -1,10 +1,12 @@
 import { query } from "express-validator";
 
-export const getImageValidator = [
+export const validImageFileTypes = ["jpeg", "png", "webp", "gif", "avif"];
+
+export const getImageValidations = [
   query("filetype")
     .optional()
     .isString()
-    .isIn(`${process.env.IMAGE_FILE_TYPES}`.split(","))
+    .isIn(validImageFileTypes)
     .withMessage("Unknown file type."),
   query("width").optional().isInt().withMessage("Invalid width."),
   query("height").optional().isInt().withMessage("Invalid height."),

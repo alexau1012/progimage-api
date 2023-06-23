@@ -1,13 +1,13 @@
 import { ImageRepository } from "../../interfaces/repositories/image-repository";
-import { ConvertImageUseCase } from "../../interfaces/use-cases/image/convert-image";
+import { ProcessImageUseCase } from "../../interfaces/use-cases/image/process-image";
 
-export const convertImage = (
+export const processImage = (
   imageRepository: ImageRepository
-): ConvertImageUseCase => {
+): ProcessImageUseCase => {
   return async (image, width, height, angle) => {
     if (!width && !height && !angle) {
       return image;
     }
-    return imageRepository.convertImage(image, width, height, angle);
+    return imageRepository.processImage(image, width, height, angle);
   };
 };

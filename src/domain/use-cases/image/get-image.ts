@@ -5,10 +5,6 @@ export const getImage = (imageRepository: ImageRepository): GetImageUseCase => {
   return async (id, fileType) => {
     const image = await imageRepository.getImage(id);
 
-    if (!image) {
-      throw Error("Image not found.");
-    }
-
     if (fileType && image.fileType !== fileType) {
       const { buffer } = await imageRepository.createImage(
         image.buffer,

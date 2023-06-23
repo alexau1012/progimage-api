@@ -2,9 +2,9 @@ import { Image } from "../../entities/image";
 
 export interface ImageRepository {
   createImage: (buffer: Buffer, fileType: Image["fileType"]) => Promise<Image>;
-  getImage: (id: string) => Promise<Image | null>;
+  getImage: (id: string) => Promise<Image>;
   storeImage: (buffer: Buffer, filePath: string) => Promise<void>;
-  convertImage: (
+  processImage: (
     image: Image,
     width: number | null,
     height: number | null,

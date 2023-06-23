@@ -4,7 +4,7 @@ import { fileSystem } from "./data/data-sources/storage/file-system";
 import { imageRepository } from "./domain/repositories/image-repository";
 import { createImage } from "./domain/use-cases/image/create-image";
 import { getImage } from "./domain/use-cases/image/get-image";
-import { convertImage } from "./domain/use-cases/image/convert-image";
+import { processImage } from "./domain/use-cases/image/process-image";
 import { ImageRouter } from "./presentation/routers/image-router";
 import server from "./server";
 
@@ -15,7 +15,7 @@ const PORT = 4000;
   const imageMiddleware = ImageRouter(
     createImage(imageRepositoryImpl),
     getImage(imageRepositoryImpl),
-    convertImage(imageRepositoryImpl)
+    processImage(imageRepositoryImpl)
   );
 
   server.use("/image", imageMiddleware);
