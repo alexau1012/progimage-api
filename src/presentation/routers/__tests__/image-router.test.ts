@@ -35,24 +35,23 @@ jest.mock("multer", () => {
 jest.mock("multer");
 
 describe("Image Router", () => {
-  beforeEach(() => {
-    jest.restoreAllMocks();
-  });
+  const imageId = "123";
+
+  const mockImage = {
+    id: "123",
+    buffer: Buffer.from("image"),
+    fileType: "jpeg",
+  } as const;
+
+  const createImage: CreateImageUseCase = jest.fn().mockResolvedValue(imageId);
+  const getImage: GetImageUseCase = jest.fn().mockResolvedValue(mockImage);
+  const processImage: ProcessImageUseCase = jest
+    .fn()
+    .mockResolvedValue(mockImage);
+
   describe("GET /image/:id", () => {
     test("should return 200 with converted image downloaded", async () => {
       const [width, height, angle] = [200, 200, 30];
-
-      const mockImage = {
-        id: "123",
-        buffer: Buffer.from("image"),
-        fileType: "jpeg",
-      } as const;
-
-      const createImage: CreateImageUseCase = jest.fn();
-      const getImage: GetImageUseCase = jest.fn().mockResolvedValueOnce(mockImage);
-      const processImage: ProcessImageUseCase = jest
-        .fn()
-        .mockResolvedValue(mockImage);
 
       const imageMiddleware = ImageRouter(createImage, getImage, processImage);
       server.use("/image", imageMiddleware);
@@ -71,13 +70,6 @@ describe("Image Router", () => {
   });
   describe("POST /image", () => {
     test("should return 200 with uploaded image id", async () => {
-      const imageId = "123";
-      const createImage: CreateImageUseCase = jest
-        .fn()
-        .mockResolvedValueOnce(imageId);
-      const getImage: GetImageUseCase = jest.fn();
-      const processImage: ProcessImageUseCase = jest.fn();
-
       const imageMiddleware = ImageRouter(createImage, getImage, processImage);
       server.use("/image", imageMiddleware);
 
