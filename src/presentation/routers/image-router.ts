@@ -36,7 +36,6 @@ export const ImageRouter = (
 
       try {
         const uid = await createImageUseCase(request.file.buffer, fileType);
-        console.log(uid, "uid");
 
         response.statusCode = 201;
         response.json({ imageId: uid });
