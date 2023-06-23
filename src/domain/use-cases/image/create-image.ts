@@ -1,4 +1,3 @@
-import { v4 as uuidv4, v5 as uuidv5 } from "uuid";
 import { ImageRepository } from "../../interfaces/repositories/image-repository";
 import { CreateImageUseCase } from "../../interfaces/use-cases/image/create-image";
 
@@ -6,13 +5,10 @@ export const createImage = (
   imageRepository: ImageRepository
 ): CreateImageUseCase => {
   return async (data, fileType) => {
-    const imageId = fileType ? uuidv5(fileType, uuidv4()) : uuidv4();
+    const { id, buffer } = await imageRepository.createImage(data, fileType);
 
-    const { id } = await imageRepository.createImage(
-      data,
-      imageId,
-      fileType
-    );
+    const filename = `${id}.${fileType}`;
+    await imageRepository.storeImage(buffer, filename);
 
     return id;
   };

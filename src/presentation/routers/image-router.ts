@@ -1,14 +1,24 @@
 import express, { Request, Response } from "express";
 import path from "path";
+import { validationResult } from "express-validator";
 import { Image } from "../../domain/entities/image";
 import { CreateImageUseCase } from "../../domain/interfaces/use-cases/image/create-image";
 import { GetImageUseCase } from "../../domain/interfaces/use-cases/image/get-image";
+import { ConvertImageUseCase } from "../../domain/interfaces/use-cases/image/convert-image";
 import { uploadImageMiddleware } from "../middlewares/upload-image-middleware";
 import { getImageValidator } from "../middlewares/validator-middleware";
 
+const handleNaN = <T extends null | undefined>(
+  value: number,
+  replacement: T
+) => {
+  return isNaN(value) ? replacement : value;
+};
+
 export const ImageRouter = (
   createImageUseCase: CreateImageUseCase,
-  getImageUseCase: GetImageUseCase
+  getImageUseCase: GetImageUseCase,
+  convertImageUseCase: ConvertImageUseCase
 ) => {
   const router = express.Router();
 
@@ -28,13 +38,38 @@ export const ImageRouter = (
     }
   );
 
-  router.get("/:id", getImageValidator, async (request: Request, response: Response) => {
-    const id = request.params.id;
-    const fileType = request.query.type as Image["fileType"];
+  router.get(
+    "/:id",
+    getImageValidator,
+    async (request: Request, response: Response) => {
+      const errors = validationResult(request);
 
-    const { path } = await getImageUseCase(id, fileType);
-    response.sendFile(path);
-  });
+      if (!errors.isEmpty()) {
+        return response.status(400).send(errors.mapped());
+      }
+
+      const id = request.params.id;
+      const requestedFileType = request.query.filetype as Image["fileType"];
+      const width = handleNaN(parseInt(request.query.width as string), null);
+      const height = handleNaN(parseInt(request.query.height as string), null);
+      const angle = handleNaN(
+        parseInt(request.query.angle as string),
+        undefined
+      );
+
+      const image = await getImageUseCase(id, requestedFileType);
+
+      const convertedImage = await convertImageUseCase(
+        image,
+        width,
+        height,
+        angle
+      );
+
+      response.contentType(`image/${convertedImage.fileType}`);
+      response.end(convertedImage.buffer);
+    }
+  );
 
   return router;
 };

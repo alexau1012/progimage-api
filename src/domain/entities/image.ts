@@ -1,5 +1,5 @@
 export interface Image {
   id: string;
-  path: string;
-  fileType: "jpeg" | "png";
+  fileType: "jpeg" | "png" | "webp" | "gif" | "avif";
+  buffer: Buffer;
 }

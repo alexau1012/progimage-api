@@ -4,6 +4,6 @@ type Data = {
 };
 
 export interface ImageDataSource {
-  createImage: (buffer: Buffer, id: string) => Promise<Data>;
+  storeImage: (buffer: Buffer, filename: string) => Promise<void>;
   getImage: (id: string) => Promise<Data | null>;
 }

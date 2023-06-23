@@ -9,14 +9,9 @@ export const imageDataSource = (storage: StorageWrapper): ImageDataSource => {
     return path.extname(filePath).slice(1);
   };
   return {
-    createImage: async (buffer, filename) => {
+    storeImage: async (buffer, filename) => {
       const filePath = path.join(outputDirectory, filename);
-      const file = await storage.insertFile(buffer, filePath, outputDirectory);
-
-      return {
-        path: file.path,
-        fileType: getFileType(file.path),
-      };
+      await storage.insertFile(buffer, filePath, outputDirectory);
     },
     getImage: async (id) => {
       const file = await storage.findFile(

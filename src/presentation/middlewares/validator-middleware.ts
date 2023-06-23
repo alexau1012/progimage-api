@@ -1,14 +1,12 @@
-import { NextFunction, Request, Response } from "express";
+import { query } from "express-validator";
 
-export const getImageValidator = (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  const validFileTypes = `${process.env.IMAGE_FILE_TYPES}`.split(",");
-  if (!validFileTypes.includes(request.query.type as string)) {
-    response.status(400);
-    throw new Error(`Unknown file type in query, must be ${validFileTypes}`);
-  }
-  next();
-};
+export const getImageValidator = [
+  query("filetype")
+    .optional()
+    .isString()
+    .isIn(`${process.env.IMAGE_FILE_TYPES}`.split(","))
+    .withMessage("Unknown file type."),
+  query("width").optional().isInt().withMessage("Invalid width."),
+  query("height").optional().isInt().withMessage("Invalid height."),
+  query("angle").optional().isInt().withMessage("Invalid angle."),
+];
