@@ -17,33 +17,53 @@ export const imageRepository = (
         buffer: newBuffer,
       };
     },
-    storeImage: async (buffer, filename) => {
-      return imageDataSource.storeImage(buffer, filename);
+    storeImage: async (buffer, id) => {
+      return imageDataSource.storeImage(buffer, id);
     },
-    getImage: async (id) => {
-      const data = await imageDataSource.getImage(id);
+    // getImage: async (id, fileType) => {
+    //   const orignalData = await imageDataSource.getImage(id);
 
-      if (!data) {
+    //   if (!orignalData) {
+    //     throw Error("NOT_FOUND");
+    //   }
+
+    //   const formattedImageBuffer = await sharp(orignalData.buffer)
+    //     [fileType]()
+    //     .toBuffer();
+
+    //   return {
+    //     id,
+    //     fileType,
+    //     buffer: formattedImageBuffer,
+    //   };
+    // },
+    // processImage: async (image, width, height, angle) => {
+    //   const processedBuffer = await sharp(image.buffer)
+    //     .resize(width, height)
+    //     .rotate(angle)
+    //     .toBuffer();
+    //   return {
+    //     ...image,
+    //     buffer: processedBuffer,
+    //   };
+    // },
+    getProcessedImage: async (id, fileType, width, height, angle) => {
+      const orignalData = await imageDataSource.getImage(id);
+
+      if (!orignalData) {
         throw Error("NOT_FOUND");
       }
 
-      const imageBuffer = await sharp(data.path).toBuffer();
-
-      return {
-        id,
-        fileType: "png",
-        path: data.path,
-        buffer: imageBuffer,
-      };
-    },
-    processImage: async (image, width, height, angle) => {
-      const resizedBuffer = await sharp(image.buffer)
+      const processedImageBuffer = await sharp(orignalData.buffer)
+        [fileType]()
         .resize(width, height)
         .rotate(angle)
         .toBuffer();
+
       return {
-        ...image,
-        buffer: resizedBuffer,
+        id,
+        fileType,
+        buffer: processedImageBuffer,
       };
     },
   };

@@ -1,6 +1,5 @@
 import request from "supertest";
-import { GetImageUseCase } from "../../../domain/interfaces/use-cases/image/get-image";
-import { ProcessImageUseCase } from "../../../domain/interfaces/use-cases/image/process-image";
+import { GetProcessedImageUseCase } from "../../../domain/interfaces/use-cases/image/get-processed-image";
 import { CreateImageUseCase } from "../../../domain/interfaces/use-cases/image/create-image";
 import server from "../../../server";
 import { ImageRouter } from "../image-router";
@@ -44,8 +43,7 @@ describe("Image Router", () => {
   } as const;
 
   const createImage: CreateImageUseCase = jest.fn().mockResolvedValue(imageId);
-  const getImage: GetImageUseCase = jest.fn().mockResolvedValue(mockImage);
-  const processImage: ProcessImageUseCase = jest
+  const getProcessedImage: GetProcessedImageUseCase = jest
     .fn()
     .mockResolvedValue(mockImage);
 
@@ -53,7 +51,7 @@ describe("Image Router", () => {
     test("should return 200 with converted image downloaded", async () => {
       const [width, height, angle] = [200, 200, 30];
 
-      const imageMiddleware = ImageRouter(createImage, getImage, processImage);
+      const imageMiddleware = ImageRouter(createImage, getProcessedImage);
       server.use("/image", imageMiddleware);
 
       const response = await request(server).get(
@@ -61,16 +59,20 @@ describe("Image Router", () => {
       );
 
       expect(response.status).toBe(200);
-      expect(getImage).toBeCalledTimes(1);
-      expect(getImage).toBeCalledWith(mockImage.id, mockImage.fileType);
-      expect(processImage).toBeCalledTimes(1);
-      expect(processImage).toBeCalledWith(mockImage, width, height, angle);
+      expect(getProcessedImage).toBeCalledTimes(1);
+      expect(getProcessedImage).toBeCalledWith(
+        mockImage.id,
+        mockImage.fileType,
+        width,
+        height,
+        angle
+      );
       expect(response.body).toStrictEqual(mockImage.buffer);
     });
   });
   describe("POST /image", () => {
     test("should return 200 with uploaded image id", async () => {
-      const imageMiddleware = ImageRouter(createImage, getImage, processImage);
+      const imageMiddleware = ImageRouter(createImage, getProcessedImage);
       server.use("/image", imageMiddleware);
 
       const response = await request(server)

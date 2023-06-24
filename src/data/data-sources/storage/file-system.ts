@@ -2,6 +2,7 @@ import sharp from "sharp";
 import fs from "fs-extra";
 import { StorageWrapper } from "../../interfaces/storage-wrapper";
 import { join } from "path";
+import { fromFile } from "file-type";
 
 export const setupOutputDir = async (path: string) => {
   const exists = await fs.pathExists(path);
@@ -14,10 +15,9 @@ export const fileSystem: StorageWrapper = {
   insertFile: async (buffer, filePath, directory) => {
     const aboluteDirectory = join(`${process.env.PWD}`, directory);
     const absoluteFilePath = join(`${process.env.PWD}`, filePath);
-    const file = sharp(buffer);
+
     await setupOutputDir(aboluteDirectory);
-    await file.toFile(absoluteFilePath);
-    return { path: absoluteFilePath };
+    await sharp(buffer).toFile(absoluteFilePath);
   },
   findFile: async (filePath) => {
     const absoluteFilePath = join(`${process.env.PWD}`, filePath);
@@ -27,6 +27,12 @@ export const fileSystem: StorageWrapper = {
       return null;
     }
 
-    return { path: absoluteFilePath };
+    const fileType = await fromFile(absoluteFilePath);
+
+    const fileExtension = fileType?.ext || "";
+
+    const fileBuffer = await sharp(absoluteFilePath).toBuffer();
+
+    return { buffer: fileBuffer, fileType: fileExtension };
   },
 };

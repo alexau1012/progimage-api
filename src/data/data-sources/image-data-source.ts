@@ -2,30 +2,18 @@ import path from "path";
 import { ImageDataSource } from "../interfaces/image-data-source";
 import { StorageWrapper } from "../interfaces/storage-wrapper";
 
-const outputDirectory = "./images";
+const OUTPUT_DIRECTORY = "./images";
 
 export const imageDataSource = (storage: StorageWrapper): ImageDataSource => {
-  const getFileType = (filePath: string) => {
-    return path.extname(filePath).slice(1);
-  };
   return {
     storeImage: async (buffer, filename) => {
-      const filePath = path.join(outputDirectory, filename);
-      await storage.insertFile(buffer, filePath, outputDirectory);
+      const filePath = path.join(OUTPUT_DIRECTORY, filename);
+      await storage.insertFile(buffer, filePath, OUTPUT_DIRECTORY);
     },
     getImage: async (id) => {
-      const file = await storage.findFile(
-        path.join(outputDirectory, `${id}.png`)
-      );
+      const file = await storage.findFile(path.join(OUTPUT_DIRECTORY, id));
 
-      if (!file) {
-        return null;
-      }
-
-      return {
-        path: file.path,
-        fileType: getFileType(file.path),
-      };
+      return file;
     },
   };
 };

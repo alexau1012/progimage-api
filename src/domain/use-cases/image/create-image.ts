@@ -7,8 +7,7 @@ export const createImage = (
   return async (data, fileType) => {
     const { id, buffer } = await imageRepository.createImage(data, fileType);
 
-    const filename = `${id}.${fileType}`;
-    await imageRepository.storeImage(buffer, filename);
+    await imageRepository.storeImage(buffer, id);
 
     return id;
   };

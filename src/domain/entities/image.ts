@@ -1,5 +1,7 @@
+type Ext = "jpeg" | "png" | "webp" | "gif" | "avif";
+
 export interface Image {
   id: string;
-  fileType: "jpeg" | "png" | "webp" | "gif" | "avif";
+  fileType: Ext;
   buffer: Buffer;
 }

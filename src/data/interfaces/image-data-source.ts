@@ -1,5 +1,5 @@
 type Data = {
-  path: string;
+  buffer: Buffer;
   fileType: string;
 };
 

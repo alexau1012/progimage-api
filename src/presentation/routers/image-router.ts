@@ -3,8 +3,7 @@ import path from "path";
 import { validationResult } from "express-validator";
 import { Image } from "../../domain/entities/image";
 import { CreateImageUseCase } from "../../domain/interfaces/use-cases/image/create-image";
-import { GetImageUseCase } from "../../domain/interfaces/use-cases/image/get-image";
-import { ProcessImageUseCase } from "../../domain/interfaces/use-cases/image/process-image";
+import { GetProcessedImageUseCase } from "../../domain/interfaces/use-cases/image/get-processed-image";
 import { uploadImageMiddleware } from "../middlewares/upload-image-middleware";
 import { getImageValidations } from "../middlewares/validator-middleware";
 
@@ -17,8 +16,7 @@ const handleNaN = <T extends null | undefined>(
 
 export const ImageRouter = (
   createImageUseCase: CreateImageUseCase,
-  getImageUseCase: GetImageUseCase,
-  processImageUseCase: ProcessImageUseCase
+  getProcessedImageUseCase: GetProcessedImageUseCase
 ) => {
   const router = express.Router();
 
@@ -66,17 +64,16 @@ export const ImageRouter = (
       );
 
       try {
-        const image = await getImageUseCase(id, requestedFileType);
-
-        const convertedImage = await processImageUseCase(
-          image,
+        const image = await getProcessedImageUseCase(
+          id,
+          requestedFileType,
           width,
           height,
           angle
         );
 
-        response.contentType(`image/${convertedImage.fileType}`);
-        response.end(convertedImage.buffer);
+        response.contentType(`image/${image.fileType}`);
+        response.end(image.buffer);
       } catch (error) {
         if (error instanceof Error) {
           console.log(error);

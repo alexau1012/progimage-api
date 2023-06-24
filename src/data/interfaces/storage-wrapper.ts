@@ -1,5 +1,6 @@
 type Data = {
-  path: string;
+  buffer: Buffer;
+  fileType: string;
 };
 
 export interface StorageWrapper {
@@ -7,6 +8,6 @@ export interface StorageWrapper {
     fileData: T,
     filePath: string,
     directory: string
-  ) => Promise<Data>;
+  ) => Promise<void>;
   findFile: (filePath: string) => Promise<Data | null>;
 }

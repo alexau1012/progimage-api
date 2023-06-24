@@ -1,8 +1,9 @@
 import { Image } from "../../../entities/image";
 
-export interface ProcessImageUseCase {
+export interface GetProcessedImageUseCase {
   (
-    image: Image,
+    id: string,
+    fileType: Image["fileType"],
     width: number | null,
     height: number | null,
     angle: number | undefined
