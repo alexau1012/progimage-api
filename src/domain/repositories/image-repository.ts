@@ -27,15 +27,22 @@ export const imageRepository = (
         throw Error("NOT_FOUND");
       }
 
-      const processedImageBuffer = await sharp(orignalData.buffer)
-        [fileType]()
+      const { buffer, fileType: orginalFileType } = orignalData;
+
+      const validFileType =
+        orginalFileType === "jpg" ? "jpeg" : orginalFileType;
+
+      const newFileType = fileType || validFileType;
+
+      const processedImageBuffer = await sharp(buffer)
+        [newFileType]()
         .resize(width, height)
         .rotate(angle)
         .toBuffer();
 
       return {
         id,
-        fileType,
+        fileType: newFileType,
         buffer: processedImageBuffer,
       };
     },
