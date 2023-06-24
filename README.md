@@ -2,13 +2,9 @@
 
 ## Overview
 
----
-
 ProgImage API is a specialised image storage and processing engine to be used by other applications, and will provide high-performance programmatic access via its API.
 
 ## Implemented Features
-
----
 
 - Upload image
 - Download a stored image
@@ -20,8 +16,6 @@ ProgImage API is a specialised image storage and processing engine to be used by
 
 ### Add Image
 
----
-
 Method: POST
 
 Endpoint: `baseUrl`/images
@@ -29,8 +23,6 @@ Endpoint: `baseUrl`/images
 Body: Multipart Form (name = upload, file = \<image.jpeg\>)
 
 ### Get Image
-
----
 
 Method GET
 
