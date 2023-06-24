@@ -38,7 +38,7 @@ Run locally using Node.js and NPM:
 
 `npm start`
 
-`baseUrl`: http://localhost:8080
+baseUrl: http://localhost:8080
 
 Run using Docker:
 
@@ -46,4 +46,4 @@ Run using Docker:
 
 `./run.sh`
 
-`baseUrl`: http://localhost:49160
+baseUrl: http://localhost:49160
